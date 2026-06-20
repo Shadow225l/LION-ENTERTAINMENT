@@ -1,471 +1,1054 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>LION LAUNCHER</title>
-
-<style>
-:root{
-    --bg:#0b0f14;
-    --panel:#111826;
-    --card:rgba(255,255,255,0.05);
-    --stroke:rgba(255,255,255,0.08);
-    --accent:#2f5d7c;
-}
-
-*{box-sizing:border-box}
-
-body{
-    margin:0;
-    font-family:Arial;
-    background:var(--bg);
-    color:#e6e6e6;
-    overflow:hidden;
-}
-
-/* LOGIN */
-#login{
-    position:fixed;
-    inset:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    background:radial-gradient(circle at top, #111826, #05070a);
-}
-
-.login-box{
-    background:var(--panel);
-    padding:25px;
-    border-radius:18px;
-    border:1px solid var(--stroke);
-    width:300px;
-}
-
-input{
-    width:100%;
-    padding:10px;
-    margin-top:10px;
-    border-radius:10px;
-    border:1px solid var(--stroke);
-    background:#0b0f14;
-    color:white;
-}
-
-/* APP */
-#app{
-    display:none;
-    height:100vh;
-}
-
-/* SIDEBAR */
-.sidebar{
-    width:220px;
-    height:100vh;
-    position:fixed;
-    background:var(--panel);
-    padding:15px;
-    border-right:1px solid var(--stroke);
-}
-
-.sidebar h2{
-    color:var(--accent);
-}
-
-/* NAV */
-.nav-item{
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:12px;
-    margin-top:10px;
-    border-radius:12px;
-    cursor:pointer;
-    transition:.2s;
-}
-
-.nav-item:hover{
-    background:rgba(255,255,255,0.06);
-}
-
-.nav-item.active{
-    background:rgba(47,93,124,0.25);
-}
-
-/* ICONOS */
-.icon{
-    width:22px;
-    height:22px;
-    fill:#cfd6dd;
-    opacity:0.9;
-    transition:.2s;
-}
-
-.nav-item:hover .icon{
-    fill:white;
-    opacity:1;
-    transform:scale(1.05);
-}
-
-.nav-item.active .icon{
-    fill:var(--accent);
-    opacity:1;
-}
-
-/* CONTENT */
-.content{
-    margin-left:220px;
-    padding:20px;
-    height:100vh;
-    overflow:auto;
-}
-
-.page{display:none;}
-.page.active{display:block;}
-
-/* CARDS */
-.card{
-    background:var(--card);
-    border:1px solid var(--stroke);
-    padding:15px;
-    border-radius:15px;
-    margin-top:10px;
-}
-
-/* GAME */
-.grid{
-    display:grid;
-    grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-    gap:10px;
-}
-
-.game{
-    background:rgba(255,255,255,0.04);
-    padding:12px;
-    border-radius:12px;
-}
-
-.game button{
-    margin-top:10px;
-    width:100%;
-    padding:10px;
-    border-radius:10px;
-    background:var(--accent);
-    color:white;
-}
-
-/* PROGRESS BAR */
-.bar-container{
-    width:100%;
-    height:6px;
-    background:#1b1f2a;
-    border-radius:10px;
-    margin-top:8px;
-    overflow:hidden;
-}
-
-.bar{
-    height:100%;
-    width:0%;
-    background:var(--accent);
-    transition:.2s;
-}
-
-/* TRAILER */
-iframe{
-    width:100%;
-    height:300px;
-    border-radius:12px;
-    border:none;
-}
-
-/* PROFILE */
-.profile{
-    display:flex;
-    gap:15px;
-    align-items:center;
-}
-
-.avatar{
-    width:60px;
-    height:60px;
-    border-radius:50%;
-    background:var(--accent);
-}
-
-/* MOBILE */
-@media (max-width:768px){
-
-.sidebar{
-    width:100%;
-    height:70px;
-    bottom:0;
-    top:auto;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    border-top:1px solid var(--stroke);
-    border-right:none;
-}
-
-.nav-item{
-    flex-direction:column;
-    font-size:12px;
-    margin:0;
-    padding:10px;
-}
-
-.content{
-    margin-left:0;
-    padding-bottom:90px;
-}
-
-.grid{
-    grid-template-columns:1fr;
-}
-
-.game button{
-    padding:14px;
-}
-}
-</style>
-</head>
-
-<body>
-
-<!-- LOGIN -->
-<div id="login">
-    <div class="login-box">
-        <h2>Login</h2>
-        <input id="user" placeholder="Usuario">
-        <input id="pass" type="password" placeholder="Contraseña">
-        <button onclick="login()">Entrar</button>
-    </div>
-</div>
-
-<!-- APP -->
-<div id="app">
-
-<div class="sidebar">
-    <h2>LION</h2>
-
-    <div class="nav-item active" onclick="openPage('games', event)">
-        <svg class="icon" viewBox="0 0 24 24">
-        <path d="M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
-        </svg>
-        Tus juegos
-    </div>
-
-    <div class="nav-item" onclick="openPage('store', event)">
-        <svg class="icon" viewBox="0 0 24 24">
-        <path d="M6 7h12l1 14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2L6 7z"/>
-        </svg>
-        Tienda
-    </div>
-
-    <div class="nav-item" onclick="openPage('trailers', event)">
-        <svg class="icon" viewBox="0 0 24 24">
-        <path d="M10 8l6 4-6 4z"/>
-        </svg>
-        Trailers
-    </div>
-
-    <div class="nav-item" onclick="openPage('profile', event)">
-        <svg class="icon" viewBox="0 0 24 24">
-        <path d="M12 12a4 4 0 1 0-4-4 4 4 0 0 0 4 4z"/>
-        </svg>
-        Perfil
-    </div>
-</div>
-
-<div class="content">
-
-<!-- GAMES -->
-<div id="games" class="page active">
-    <h2>Tus juegos</h2>
-
-    <div class="grid">
-
-        <div class="game">
-            <h3>The Factory Ch.1</h3>
-            <small id="statusGame">No en wishlist</small>
-
-            <div class="bar-container">
-                <div id="bar" class="bar"></div>
-            </div>
-
-            <button id="gameBtn" onclick="gameAction()">Añadir a Wishlist</button>
-        </div>
-
-    </div>
-</div>
-
-<!-- STORE -->
-<div id="store" class="page">
-    <h2>Tienda</h2>
-
-    <div class="card">
-        <h3>The Factory Chapter 1</h3>
-        <p>Juego en desarrollo</p>
-    </div>
-</div>
-
-<!-- TRAILERS -->
-<div id="trailers" class="page">
-    <h2>Trailers</h2>
-
-    <div class="card">
-        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ"></iframe>
-    </div>
-</div>
-
-<!-- PROFILE -->
-<div id="profile" class="page">
-    <h2>Perfil</h2>
-
-    <div class="card profile">
-        <div class="avatar"></div>
-        <div>
-            <h3 id="username"></h3>
-            <small>Usuario local</small>
-        </div>
-    </div>
-</div>
-
-</div>
-</div>
-
-<script>
-
-/* LOGIN */
-function login(){
-    const u = document.getElementById("user").value;
-    if(!u.trim()) return;
-
-    localStorage.setItem("user", u);
-
-    document.getElementById("login").style.display="none";
-    document.getElementById("app").style.display="block";
-
-    document.getElementById("username").innerText = u;
-}
-
-/* NAV */
-function openPage(id, e){
-    document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
-    document.getElementById(id).classList.add("active");
-
-    document.querySelectorAll(".nav-item").forEach(n=>n.classList.remove("active"));
-    e.target.classList.add("active");
-}
-
-/* AUTO LOGIN */
-window.onload = ()=>{
-    const u = localStorage.getItem("user");
-    if(u){
-        document.getElementById("login").style.display="none";
-        document.getElementById("app").style.display="block";
-        document.getElementById("username").innerText = u;
-    }
-
-    updateGameUI();
-}
-
-/* SYSTEM */
-let gameState = localStorage.getItem("factory_state") || "not_wishlist";
-let progress = 0;
-let downloading = false;
-
-const downloadLink = "https://www.mediafire.com/";
-
-function updateGameUI(){
-
-    const btn = document.getElementById("gameBtn");
-    const status = document.getElementById("statusGame");
-
-    if(gameState === "not_wishlist"){
-        btn.innerText = "Añadir a Wishlist";
-        status.innerText = "No en wishlist";
-    }
-
-    if(gameState === "wishlist"){
-        btn.innerText = "Descargar";
-        status.innerText = "En wishlist";
-    }
-
-    if(gameState === "downloading"){
-        btn.innerText = "Descargando " + progress + "%";
-        status.innerText = "Descargando...";
-    }
-
-    if(gameState === "downloaded"){
-        btn.innerText = "Instalar";
-        status.innerText = "Descargado";
-    }
-
-    if(gameState === "installed"){
-        btn.innerText = "Jugar";
-        status.innerText = "Instalado";
-    }
-
-    document.getElementById("bar").style.width = progress + "%";
-}
-
-/* DOWNLOAD */
-function startDownload(){
-
-    if(downloading) return;
-
-    downloading = true;
-    progress = 0;
-    gameState = "downloading";
-
-    let interval = setInterval(()=>{
-
-        progress += Math.floor(Math.random()*10)+5;
-
-        if(progress >= 100){
-            progress = 100;
-            clearInterval(interval);
-            downloading = false;
-
-            gameState = "downloaded";
-            localStorage.setItem("factory_state", gameState);
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lion Launcher</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --panel: #121a24;
+            --card: #182331;
+            --accent: #4f8bc9;
+            --accent-hover: #3b6da0;
+            --text: #fff;
+            --muted: #9aa7b5;
+            --danger: #e05555;
+            --success: #4caf84;
+            --wish: #f5a623;
+            --coin: #f7c948;
+            --radius: 16px;
+            --transition: 0.2s ease;
         }
 
-        updateGameUI();
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, sans-serif;
+        }
 
-    }, 400);
-}
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
 
-function gameAction(){
+        /* ========== TOPBAR ========== */
+        .topbar {
+            height: 70px;
+            background: var(--panel);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+            gap: 15px;
+        }
 
-    if(gameState === "not_wishlist"){
-        gameState = "wishlist";
-        localStorage.setItem("factory_state", gameState);
-        updateGameUI();
-        return;
-    }
+        .topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex: 1;
+            min-width: 0;
+        }
 
-    if(gameState === "wishlist"){
-        window.open(downloadLink, "_blank");
-        startDownload();
-        return;
-    }
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            white-space: nowrap;
+        }
 
-    if(gameState === "downloaded"){
-        gameState = "installed";
-        localStorage.setItem("factory_state", gameState);
-        updateGameUI();
-        return;
-    }
+        .logo i {
+            font-size: 1.4rem;
+        }
 
-    if(gameState === "installed"){
-        alert("🎮 Iniciando The Factory Ch.1...");
-    }
-}
+        .search-bar-top {
+            position: relative;
+            flex: 1;
+            max-width: 350px;
+            min-width: 150px;
+        }
 
-</script>
+        .search-bar-top input {
+            width: 100%;
+            padding: 8px 15px 8px 38px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--bg);
+            color: #fff;
+            font-size: 0.9rem;
+            transition: border var(--transition);
+        }
 
+        .search-bar-top input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .search-bar-top i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-shrink: 0;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 30px;
+            transition: background var(--transition);
+            white-space: nowrap;
+        }
+
+        .profile:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--accent);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        #profileName {
+            font-weight: 500;
+            color: #fff;
+        }
+
+        .coin-display {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(247, 201, 72, 0.1);
+            padding: 8px 14px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background var(--transition);
+            border: 1px solid rgba(247, 201, 72, 0.25);
+        }
+
+        .coin-display:hover {
+            background: rgba(247, 201, 72, 0.2);
+        }
+
+        .coin-display i {
+            color: var(--coin);
+        }
+
+        #coinBalance {
+            font-weight: 700;
+            color: var(--coin);
+        }
+
+        /* ========== SIDEBAR ========== */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 70px;
+            bottom: 0;
+            width: 240px;
+            background: var(--panel);
+            padding: 20px 10px;
+            border-right: 1px solid rgba(255, 255, 255, 0.08);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            z-index: 999;
+            transition: width var(--transition);
+        }
+
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .menu button {
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            padding: 14px 18px;
+            border-radius: var(--radius);
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            transition: all var(--transition);
+            width: 100%;
+        }
+
+        .menu button i {
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        .menu button:hover {
+            background: rgba(255, 255, 255, 0.06);
+            color: #fff;
+        }
+
+        .menu button.active {
+            background: var(--accent);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 8px 20px rgba(79, 139, 201, 0.25);
+        }
+
+        .sidebar-footer {
+            padding: 10px 18px;
+            color: var(--muted);
+            font-size: 0.75rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+            padding-top: 15px;
+        }
+
+        /* ========== CONTENT ========== */
+        .content {
+            margin-left: 240px;
+            padding: 90px 25px 40px;
+            min-height: 100vh;
+        }
+
+        .page {
+            display: none;
+            animation: fadeSlide 0.3s ease;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeSlide {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ========== HERO ========== */
+        .hero {
+            height: 380px;
+            border-radius: 25px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 35px;
+            background: #0a0f18;
+        }
+
+        .hero .no-thumbnail-hero {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1a2332;
+            color: var(--muted);
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .hero .no-thumbnail-hero i {
+            font-size: 5rem;
+            opacity: 0.4;
+        }
+
+        .hero .no-thumbnail-hero span {
+            font-size: 1.2rem;
+            opacity: 0.7;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to right, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.1) 70%);
+        }
+
+        .hero-content {
+            position: absolute;
+            z-index: 2;
+            left: 40px;
+            bottom: 40px;
+            max-width: 500px;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 10px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .hero p {
+            color: #ddd;
+            margin-bottom: 20px;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+            line-height: 1.5;
+        }
+
+        .hero-btn {
+            background: #555;
+            border: none;
+            color: white;
+            padding: 14px 30px;
+            border-radius: 12px;
+            cursor: not-allowed;
+            font-weight: 700;
+            font-size: 1rem;
+            transition: background var(--transition), transform var(--transition);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            opacity: 0.5;
+        }
+
+        /* ========== SECTION TITLES ========== */
+        .section-title {
+            font-size: 1.5rem;
+            margin: 30px 0 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* ========== GRID ========== */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        /* ========== GAME CARD ========== */
+        .game-card {
+            background: var(--card);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: all 0.3s;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .game-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 35px rgba(0, 0, 0, 0.45);
+        }
+
+        .game-card .no-thumbnail {
+            width: 100%;
+            height: 180px;
+            background: #1a2332;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: var(--muted);
+            gap: 8px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .game-card .no-thumbnail i {
+            font-size: 2.5rem;
+            opacity: 0.5;
+        }
+
+        .game-card .no-thumbnail span {
+            font-size: 0.85rem;
+            opacity: 0.7;
+        }
+
+        .game-info {
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .game-info h3 {
+            margin-bottom: 8px;
+            font-size: 1.1rem;
+        }
+
+        .tags {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .tag {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 50px;
+            background: rgba(79, 139, 201, 0.15);
+            color: #7bb5f0;
+            font-size: 0.75rem;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+
+        .card-btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            transition: all var(--transition);
+            margin-top: auto;
+        }
+
+        .btn-blocked {
+            background: #444;
+            color: #aaa;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--muted);
+            grid-column: 1 / -1;
+        }
+
+        .empty-state i {
+            font-size: 3rem;
+            display: block;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* ========== SETTINGS PAGE ========== */
+        .settings-group {
+            background: var(--card);
+            border-radius: var(--radius);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .settings-group h3 {
+            margin-bottom: 15px;
+            color: var(--accent);
+        }
+
+        .settings-group label {
+            display: block;
+            margin: 12px 0 6px;
+            color: var(--muted);
+            font-size: 0.9rem;
+        }
+
+        .settings-group input[type="text"],
+        .settings-group input[type="url"] {
+            width: 100%;
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #1e2a3a;
+            background: var(--bg);
+            color: #fff;
+            font-size: 1rem;
+        }
+
+        .settings-group input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border-radius: 8px;
+            border: 1px solid #1e2a3a;
+            background: var(--bg);
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        .settings-group button {
+            margin-top: 12px;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 8px;
+        }
+
+        .btn-save {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-save:hover {
+            background: var(--accent-hover);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c0392b;
+        }
+
+        .btn-youtube {
+            background: #ff0000;
+            color: white;
+        }
+
+        .btn-youtube:hover {
+            background: #cc0000;
+        }
+
+        .avatar-preview {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin: 10px 0;
+        }
+
+        .avatar-preview .avatar {
+            width: 60px;
+            height: 60px;
+        }
+
+        /* ========== TOAST ========== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: #222;
+            color: #fff;
+            padding: 14px 22px;
+            border-radius: 12px;
+            z-index: 9999;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: slideUp 0.3s ease, fadeOut 0.3s 2.7s forwards;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 500;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        /* ========== MOBILE ========== */
+        @media (max-width: 900px) {
+            .topbar-left {
+                gap: 10px;
+            }
+            .logo {
+                font-size: 1rem;
+            }
+            .search-bar-top {
+                max-width: 200px;
+            }
+            .topbar-right {
+                gap: 8px;
+            }
+            #profileName {
+                display: none;
+            }
+            .sidebar {
+                width: 70px;
+                padding: 15px 5px;
+            }
+            .menu button span {
+                display: none;
+            }
+            .menu button {
+                justify-content: center;
+                padding: 14px 10px;
+            }
+            .menu button i {
+                font-size: 1.3rem;
+            }
+            .sidebar-footer {
+                display: none;
+            }
+            .content {
+                margin-left: 70px;
+                padding: 85px 15px 30px;
+            }
+            .hero {
+                height: 280px;
+            }
+            .hero h1 {
+                font-size: 2rem;
+            }
+            .hero-content {
+                left: 20px;
+                bottom: 20px;
+            }
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .coin-display span:not(#coinBalance) {
+                display: none;
+            }
+        }
+
+        @media (max-width: 500px) {
+            .hero {
+                height: 220px;
+                border-radius: 18px;
+            }
+            .hero h1 {
+                font-size: 1.5rem;
+            }
+            .hero p {
+                font-size: 0.85rem;
+            }
+            .search-bar-top {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========== TOPBAR ========== -->
+    <div class="topbar">
+        <div class="topbar-left">
+            <div class="logo" onclick="navigate('home')">
+                <i class="fa-solid fa-gamepad"></i> Lion Launcher
+            </div>
+            <div class="search-bar-top">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="globalSearch" placeholder="Buscar mapas..." oninput="handleGlobalSearch()">
+            </div>
+        </div>
+        <div class="topbar-right">
+            <div class="profile" onclick="changeUsername()" title="Clic para cambiar nombre">
+                <div class="avatar" id="topAvatar">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <span id="profileName">Lion</span>
+            </div>
+            <div class="coin-display" title="Tus monedas" onclick="navigate('settings')">
+                <i class="fa-solid fa-coins"></i>
+                <span id="coinBalance">0</span>
+                <span style="font-size:0.8rem;opacity:0.7;">🪙</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========== SIDEBAR ========== -->
+    <div class="sidebar">
+        <div class="menu">
+            <button class="active" data-page="home"><i class="fa-solid fa-house"></i> <span>Inicio</span></button>
+            <button data-page="explore"><i class="fa-solid fa-compass"></i> <span>Explorar</span></button>
+            <button data-page="library"><i class="fa-solid fa-book"></i> <span>Biblioteca</span></button>
+            <button data-page="wishlist"><i class="fa-solid fa-heart"></i> <span>Wishlist</span></button>
+            <button data-page="settings"><i class="fa-solid fa-gear"></i> <span>Ajustes</span></button>
+        </div>
+        <div class="sidebar-footer">v2.2 · Lion Studios</div>
+    </div>
+
+    <!-- ========== CONTENT ========== -->
+    <div class="content">
+
+        <!-- Página INICIO -->
+        <div id="home" class="page active">
+            <div class="hero">
+                <div class="no-thumbnail-hero">
+                    <i class="fa-solid fa-image"></i>
+                    <span>Sin miniatura</span>
+                </div>
+                <div class="hero-content">
+                    <h1 id="heroTitle">The Factory</h1>
+                    <p id="heroDesc">Explora una fábrica abandonada llena de secretos, criaturas y misterios.</p>
+                    <button class="hero-btn" disabled>
+                        <i class="fa-solid fa-lock"></i> Bloqueado
+                    </button>
+                </div>
+            </div>
+            <h2 class="section-title"><i class="fa-solid fa-fire"></i> Destacado</h2>
+            <div class="grid" id="popularGrid"></div>
+        </div>
+
+        <!-- Página EXPLORAR -->
+        <div id="explore" class="page">
+            <h2 class="section-title"><i class="fa-solid fa-compass"></i> Explorar Mapas</h2>
+            <div class="grid" id="exploreGrid"></div>
+        </div>
+
+        <!-- Página BIBLIOTECA -->
+        <div id="library" class="page">
+            <h2 class="section-title"><i class="fa-solid fa-book"></i> Mi Biblioteca</h2>
+            <div class="grid" id="libraryGrid"></div>
+        </div>
+
+        <!-- Página WISHLIST -->
+        <div id="wishlist" class="page">
+            <h2 class="section-title"><i class="fa-solid fa-heart"></i> Mi Wishlist</h2>
+            <div class="grid" id="wishlistGrid"></div>
+        </div>
+
+        <!-- Página AJUSTES -->
+        <div id="settings" class="page">
+            <h2 class="section-title"><i class="fa-solid fa-gear"></i> Ajustes</h2>
+
+            <div class="settings-group">
+                <h3><i class="fa-solid fa-user"></i> Perfil</h3>
+                <label>Nombre de usuario</label>
+                <input type="text" id="usernameInput" placeholder="Tu nombre" maxlength="20">
+                <label>Color del nombre</label>
+                <input type="color" id="nameColorInput" value="#ffffff">
+                <label>Foto de perfil (URL)</label>
+                <input type="url" id="avatarUrlInput" placeholder="https://ejemplo.com/foto.jpg">
+                <div class="avatar-preview">
+                    <div class="avatar" id="avatarPreview">
+                        <i class="fa-solid fa-user"></i>
+                    </div>
+                    <span style="color:var(--muted); font-size:0.85rem;">Vista previa</span>
+                </div>
+                <button class="btn-save" onclick="saveProfileSettings()"><i class="fa-solid fa-check"></i> Guardar cambios</button>
+            </div>
+
+            <div class="settings-group">
+                <h3><i class="fa-solid fa-coins"></i> Monedas</h3>
+                <p style="margin-bottom:10px;">Saldo actual: <strong id="settingsCoinBalance" style="color:var(--coin);">0</strong> 🪙</p>
+                <p style="color:var(--muted); margin-bottom:15px; font-size:0.9rem;">
+                    Gana monedas suscribiéndote al canal de YouTube.
+                </p>
+                <button class="btn-youtube" onclick="subscribeYoutube()">
+                    <i class="fa-brands fa-youtube"></i> Suscribirse a @Lion-Entertainment225
+                </button>
+                <p style="color:var(--muted); font-size:0.75rem; margin-top:8px;">
+                    * Al suscribirte recibirás 100 monedas.
+                </p>
+            </div>
+
+            <div class="settings-group">
+                <h3><i class="fa-solid fa-database"></i> Datos</h3>
+                <p style="color:var(--muted); margin-bottom:10px;">Elimina todos los datos locales.</p>
+                <button class="btn-danger" onclick="resetData()"><i class="fa-solid fa-trash"></i> Restablecer todo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toastContainer"></div>
+
+    <script>
+        (function() {
+            // ==================== DATOS ====================
+            const STORAGE_KEY = 'lion_launcher_v5';
+            const USER_KEY = 'lion_user_v5';
+            const COINS_KEY = 'lion_coins_v5';
+            const PROFILE_KEY = 'lion_profile_v5';
+
+            const defaultGames = [
+                { 
+                    id: 1, 
+                    name: 'The Factory', 
+                    img: '',
+                    tag: 'Terror', 
+                    desc: 'Fábrica abandonada llena de secretos oscuros.', 
+                    state: 'blocked', 
+                    progress: 0 
+                }
+            ];
+
+            let games = [];
+            let username = 'Lion';
+            let coins = 0;
+            let profile = { avatarUrl: '', nameColor: '#ffffff' };
+            let currentPage = 'home';
+
+            // ==================== INICIALIZACIÓN ====================
+            function loadData() {
+                const saved = localStorage.getItem(STORAGE_KEY);
+                if (saved) {
+                    try { games = JSON.parse(saved); } catch (e) { games = [...defaultGames]; }
+                } else {
+                    games = [...defaultGames];
+                }
+
+                const savedUser = localStorage.getItem(USER_KEY);
+                if (savedUser) username = savedUser;
+
+                const savedCoins = localStorage.getItem(COINS_KEY);
+                if (savedCoins) coins = parseInt(savedCoins) || 0;
+
+                const savedProfile = localStorage.getItem(PROFILE_KEY);
+                if (savedProfile) {
+                    try { profile = JSON.parse(savedProfile); } catch (e) { profile = { avatarUrl: '', nameColor: '#ffffff' }; }
+                }
+
+                updateUI();
+                document.getElementById('usernameInput').value = username;
+                document.getElementById('nameColorInput').value = profile.nameColor;
+                document.getElementById('avatarUrlInput').value = profile.avatarUrl;
+                updateAvatarPreview();
+            }
+
+            function saveGames() { localStorage.setItem(STORAGE_KEY, JSON.stringify(games)); }
+            function saveCoins() { localStorage.setItem(COINS_KEY, coins); updateCoinDisplay(); }
+            function saveProfileToStorage() { localStorage.setItem(PROFILE_KEY, JSON.stringify(profile)); }
+
+            function updateCoinDisplay() {
+                document.getElementById('coinBalance').textContent = coins;
+                document.getElementById('settingsCoinBalance').textContent = coins;
+            }
+
+            function updateUI() {
+                document.getElementById('profileName').textContent = username;
+                document.getElementById('profileName').style.color = profile.nameColor;
+                updateCoinDisplay();
+                updateTopAvatar();
+            }
+
+            function updateTopAvatar() {
+                const avatarContainer = document.getElementById('topAvatar');
+                if (profile.avatarUrl) {
+                    avatarContainer.innerHTML = `<img src="${profile.avatarUrl}" alt="Avatar" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-user\\'></i>'">`;
+                } else {
+                    avatarContainer.innerHTML = '<i class="fa-solid fa-user"></i>';
+                }
+            }
+
+            function updateAvatarPreview() {
+                const preview = document.getElementById('avatarPreview');
+                const url = document.getElementById('avatarUrlInput').value;
+                if (url) {
+                    preview.innerHTML = `<img src="${url}" alt="Preview" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-user\\'></i>'">`;
+                } else {
+                    preview.innerHTML = '<i class="fa-solid fa-user"></i>';
+                }
+            }
+
+            // ==================== NAVEGACIÓN ====================
+            function navigate(page) {
+                currentPage = page;
+                document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+                const target = document.getElementById(page);
+                if (target) target.classList.add('active');
+                document.querySelectorAll('.menu button').forEach(b => b.classList.remove('active'));
+                const btn = document.querySelector(`.menu button[data-page="${page}"]`);
+                if (btn) btn.classList.add('active');
+                renderAll();
+            }
+
+            document.querySelectorAll('.menu button').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const page = btn.dataset.page;
+                    if (page) navigate(page);
+                });
+            });
+
+            // ==================== BÚSQUEDA GLOBAL ====================
+            function handleGlobalSearch() {
+                renderAll();
+            }
+
+            function getGlobalSearchTerm() {
+                const input = document.getElementById('globalSearch');
+                return input ? input.value.toLowerCase().trim() : '';
+            }
+
+            // ==================== ACCIONES ====================
+            function showToast(message) {
+                const container = document.getElementById('toastContainer');
+                const toast = document.createElement('div');
+                toast.className = 'toast';
+                toast.innerHTML = message;
+                container.appendChild(toast);
+                setTimeout(() => { if (toast.parentNode) toast.remove(); }, 3000);
+            }
+
+            // ==================== MONEDAS ====================
+            function subscribeYoutube() {
+                window.open('https://www.youtube.com/@Lion-Entertainment225', '_blank');
+                if (confirm('¿Te has suscrito al canal @Lion-Entertainment225? Recibirás 100 monedas.')) {
+                    coins += 100;
+                    saveCoins();
+                    showToast('🎉 ¡Gracias por suscribirte! +100 🪙');
+                }
+            }
+            window.subscribeYoutube = subscribeYoutube;
+
+            // ==================== PERFIL ====================
+            function changeUsername() {
+                const newName = prompt('Nuevo nombre de usuario:', username);
+                if (newName && newName.trim()) {
+                    username = newName.trim();
+                    document.getElementById('profileName').textContent = username;
+                    document.getElementById('usernameInput').value = username;
+                    localStorage.setItem(USER_KEY, username);
+                    showToast(`👤 Nombre cambiado a "${username}"`);
+                }
+            }
+            window.changeUsername = changeUsername;
+
+            function saveProfileSettings() {
+                const nameInput = document.getElementById('usernameInput');
+                const colorInput = document.getElementById('nameColorInput');
+                const avatarInput = document.getElementById('avatarUrlInput');
+
+                const newName = nameInput.value.trim();
+                if (newName) {
+                    username = newName;
+                    localStorage.setItem(USER_KEY, username);
+                }
+
+                profile.nameColor = colorInput.value;
+                profile.avatarUrl = avatarInput.value.trim();
+                saveProfileToStorage();
+                updateUI();
+                updateAvatarPreview();
+                showToast('✅ Perfil actualizado correctamente');
+            }
+            window.saveProfileSettings = saveProfileSettings;
+
+            function resetData() {
+                if (confirm('¿Estás seguro? Se perderán todos los datos.')) {
+                    localStorage.removeItem(STORAGE_KEY);
+                    localStorage.removeItem(COINS_KEY);
+                    localStorage.removeItem(PROFILE_KEY);
+                    games = [...defaultGames];
+                    coins = 0;
+                    profile = { avatarUrl: '', nameColor: '#ffffff' };
+                    saveGames();
+                    saveCoins();
+                    saveProfileToStorage();
+                    updateUI();
+                    document.getElementById('usernameInput').value = username;
+                    document.getElementById('nameColorInput').value = '#ffffff';
+                    document.getElementById('avatarUrlInput').value = '';
+                    updateAvatarPreview();
+                    navigate('home');
+                    showToast('🔄 Datos restablecidos');
+                }
+            }
+            window.resetData = resetData;
+
+            // ==================== RENDERIZADO ====================
+            function createGameCard(game) {
+                return `
+                <div class="game-card">
+                    <div class="no-thumbnail">
+                        <i class="fa-solid fa-image"></i>
+                        <span>Sin miniatura</span>
+                    </div>
+                    <div class="game-info">
+                        <div class="tags"><span class="tag">${game.tag || 'Aventura'}</span></div>
+                        <h3>${game.name}</h3>
+                        <button class="card-btn btn-blocked" disabled><i class="fa-solid fa-lock"></i> Bloqueado</button>
+                    </div>
+                </div>`;
+            }
+
+            function filterByGlobalSearch(gameList) {
+                const term = getGlobalSearchTerm();
+                if (!term) return gameList;
+                return gameList.filter(g => g.name.toLowerCase().includes(term));
+            }
+
+            function renderPopular() {
+                const container = document.getElementById('popularGrid');
+                if (!container) return;
+                const filtered = filterByGlobalSearch(games);
+                if (filtered.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><p>Sin resultados</p></div>';
+                } else {
+                    container.innerHTML = filtered.map(g => createGameCard(g)).join('');
+                }
+            }
+
+            function renderExplore() {
+                const container = document.getElementById('exploreGrid');
+                if (!container) return;
+                const filtered = filterByGlobalSearch(games);
+                if (filtered.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-magnifying-glass"></i><p>Sin resultados</p></div>';
+                } else {
+                    container.innerHTML = filtered.map(g => createGameCard(g)).join('');
+                }
+            }
+
+            function renderLibrary() {
+                const container = document.getElementById('libraryGrid');
+                if (!container) return;
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-book-open"></i><p>No tienes juegos instalados.</p></div>';
+            }
+
+            function renderWishlist() {
+                const container = document.getElementById('wishlistGrid');
+                if (!container) return;
+                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-heart-circle-plus"></i><p>Tu lista de deseos está vacía.</p></div>';
+            }
+
+            function renderAll() {
+                renderPopular();
+                renderExplore();
+                renderLibrary();
+                renderWishlist();
+            }
+
+            // ==================== INICIAR ====================
+            function init() {
+                loadData();
+                renderAll();
+                const hash = window.location.hash.replace('#', '');
+                if (hash && document.getElementById(hash)) navigate(hash);
+                const avatarInput = document.getElementById('avatarUrlInput');
+                if (avatarInput) avatarInput.addEventListener('input', updateAvatarPreview);
+            }
+
+            window.addEventListener('load', init);
+            window.navigate = navigate;
+        })();
+    </script>
 </body>
 </html>
